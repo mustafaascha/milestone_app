@@ -52,13 +52,14 @@ def polynomial():
 
     return encode_utf8(html)
 
-@app.route('/')
-def main():
-  return redirect('/index')
+#@app.route('/')
+#def main():
+#  return redirect('/index')
 
 @app.route('/index')
 def index():
   return render_template('index.html')
 
 if __name__ == '__main__':
+    print(__doc__)
   app.run(port=33507)
