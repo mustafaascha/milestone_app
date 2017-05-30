@@ -1,65 +1,51 @@
 from flask import Flask, render_template, request, redirect
-
+import pandas as pd
+import requests as req
+import simplejson as json
+from bokeh.plotting import Figure
 from bokeh.embed import components
-from bokeh.plotting import figure
-from bokeh.resources import INLINE
-from bokeh.util.string import encode_utf8
 
 app = Flask(__name__)
 
-colors = {
-        'Black': '#000000', 
-        'Red': '#FF0000',
-        'Green': '#00FF00',
-        'Blue': '#0000FF'
-        }
+api =  "96MxM7FkumHEe4shswrC"
+requested_ticker = "FB"
+search_params = {"ticker": requested_ticker, 
+        "qopts.export": "date,open", 
+        "api_key": api}
 
-def getitem(obj, item, default):
-    if item not in obj:
-        return default
-    else:
-        return obj[item]
+dtf = req.get(url = "https://www.quandl.com/api/v3/datatables/WIKI/PRICES.json", 
+        params = search_params)
 
-@app.route("/")
-def polynomial():
-    #get arguments from flask URL
-    args = flask.request.args
+open_price = []
+for row in dtf.json()['datatable']['data']:
+  open_price.append(row[2])
 
-    #get form arguments from url, with defaults
-    color = getitem(args, 'color', 'Black')
-    _from = int(getitem(args, '_from', 0))
-    to = int(getitem(args, 'to', 10))
+open_date = []
+for row in dtf.json()['datatable']['data']:
+  open_date.append(row[1])
 
-    #make graph
-    x = list(range(_from, to + 1))
-    fig = figure(title = 'Polynomial')
-    fig.line(x, [i ** 2 for i in x], color = colors[color], line_width = 2)
+open_date = pd.to_datetime(open_date)
 
-    js_resources = INLINE.render_js()
-    css_resources = INLINE.render_css()
+def make_plot(open_date, open_price):
+    plot = Figure(
+            title = 'Data from Quandl WIKI set: FB for now', 
+            x_axis_label = 'date',
+            x_axis_type = 'datetime')
 
-    script, div = components(fig)
-    html = flask.render_template(
-            'embed.html',
-            plot_script = script,
-            plot_div = div,
-            js_resources = js_resources,
-            css_resources = css_resources,
-            color = color,
-            _from = _from,
-            to = to
-            )
+    plot.line(open_price, open_date)
 
-    return encode_utf8(html)
+    return(plot)
 
-#@app.route('/')
-#def main():
-#  return redirect('/index')
+
+@app.route('/')
+def main():
+  return redirect('/index')
 
 @app.route('/index')
 def index():
-  return render_template('index.html')
+  plot = make_plot(open_price, open_date)
+  script, div = components(plot)
+  return render_template('index.html', script = script, div = div)
 
 if __name__ == '__main__':
-  print(__doc__)
-  app.run(port=33507)
+  app.run(port=33507, debug = True)
