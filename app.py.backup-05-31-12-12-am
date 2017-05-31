@@ -33,7 +33,7 @@ def get_data(requested_ticker):
 
 def make_plot(open_date, open_price):
     plot = Figure(
-            title = 'Data from Quandl WIKI set', 
+            title = 'Data from Quandl WIKI set: FB for now', 
             x_axis_label = 'date',
             x_axis_type = 'datetime')
 
@@ -49,14 +49,14 @@ def main():
 
 @app.route('/index', methods = ['GET', 'POST'])
 def index():
-    #return render_template('index.html')
-    app.ticker = request.form.get('ticker')
-    return render_template('index.html', ticker = app.ticker)
+        #return render_template('index.html')
+        app.ticker = request.form.get('ticker')
+        return render_template('index.html', ticker = ticker)
   
 
 @app.route('/graph', methods = ['GET', 'POST'])
 def graph():
-    open_date, open_price = get_data(request.args.get('ticker'))
+    open_date, open_price = get_data(app.ticker)
     plot = make_plot(open_price, open_date)
     script, div = components(plot)
     return render_template('graph.html', script = script, div = div)

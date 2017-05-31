@@ -11,17 +11,9 @@
 	</head>
 	<body>
 		<div class=page>
-			<h4> Please enter a ticker below: </h4>
-			<div class=metanav>
-				<form id='ticker' method='get' action='graph'/>
-					<p>
-					Ticker: <input type='text' name='ticker'/>
-					</p>
-					<p>
-					<input type='submit' value='Submit'/>
-					</p>
-			</div>
-
+			<h1> First plot </h1>
+			{{ script | safe }}
+			{{ div | safe }}
 		</div>
 	</body>
 </html>
