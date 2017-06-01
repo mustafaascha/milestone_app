@@ -13,12 +13,28 @@
 		<div class=page>
 			<h4> Please enter a ticker below: </h4>
 			<div class=metanav>
-				<form id='ticker' method='get' action='graph'/>
+				<form id='ticker' method='get' action='graph'>
 					<p>
-					Ticker: <input type='text' name='ticker'/>
+					Ticker: <input type='text' name='ticker'> </input>
+					</p>
+					<h4> Price to plot: </h4>
+					<p>
+					Open: <input type='radio' name='xaxis' value='open' > </input>
 					</p>
 					<p>
-					<input type='submit' value='Submit'/>
+					High: <input type='radio' name='xaxis' value='high'> </input>
+					</p>
+					<p>
+					Low: <input type='radio' name='xaxis' value='low'> </input>
+					</p>
+					<p>
+					Close: <input type='radio' name='xaxis' value='close'> </input>
+					</p>
+					<p>
+					Volume: <input type='radio' name='xaxis' value='volume'> </input>
+					</p>
+					<p>
+					<input type='submit' value='Submit'>
 					</p>
 			</div>
 

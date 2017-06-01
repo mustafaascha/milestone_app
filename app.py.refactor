@@ -1,0 +1,70 @@
+from flask import Flask, render_template, request, redirect
+import pandas as pd
+import requests as req
+import simplejson as json
+from bokeh.plotting import Figure
+from bokeh.embed import components
+
+app = Flask(__name__)
+
+def get_data(requested_ticker):
+    #requested_ticker = "FB"
+    return(dtf)
+
+def get_col(request_object, col_to_pull):
+    #get col names
+    col_names = []
+    for col in request_object.json()['datatable']['columns']:
+        col_names.append(str(col.values())[14:].split("'")[0])
+
+    #append value from row, index(ticker) to col_data
+    col_data = []
+    for row in request_object.json()['datatable']['data']:
+        col_data.append(row[col_names.index(col_to_pull)])
+
+    return(col_data)
+
+
+def make_plot(open_date, open_price):
+    plot = Figure(
+            title = 'Data from Quandl WIKI set', 
+            x_axis_label = 'date',
+            x_axis_type = 'datetime')
+
+    plot.line(open_price, open_date)
+
+    return(plot)
+
+app.ticker = "" 
+
+@app.route('/')
+def main():
+  return redirect('/index')
+
+@app.route('/index', methods = ['GET', 'POST'])
+def index():
+    #return render_template('index.html')
+    app.ticker = request.form.get('ticker')
+    return render_template('index.html', ticker = app.ticker)
+  
+
+@app.route('/graph', methods = ['GET', 'POST'])
+def graph():
+
+    search_params = {"ticker": request.args.get('ticker'), 
+            "qopts.export": "date,open", 
+            "api_key": "96MxM7FkumHEe4shswrC"}
+
+    requested_data = req.get(url = "https://www.quandl.com/api/v3/datatables/WIKI/PRICES.json", 
+            params = search_params)
+
+    open_price = get_col(requested_data, 'open')
+    open_date = get_col(requested_data, 'date')
+
+    plot = make_plot(open_price, open_date)
+    script, div = components(plot)
+
+    return render_template('graph.html', script = script, div = div)
+
+if __name__ == '__main__':
+  app.run(port=33507, debug = True)
