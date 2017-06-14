@@ -35,9 +35,12 @@ def make_plot(col_names, col_values, col_dates, cols):
             x_axis_label = 'date',
             x_axis_type = 'datetime')
 
-    for col in cols: 
+    colors = ['#4286f4', '#f44242', '#f4bc42', '#50f442', '#42f4e5']
+
+    for color, col in zip(range(4), cols): 
         plot.line(col_dates, 
-                col_values[col_names.index(col)])
+                col_values[col_names.index(col)], 
+                color = colors[color])
 
     return(plot)
 
