@@ -30,7 +30,7 @@ def get_data(requested_ticker):
 
 
 def make_plot(col_names, col_values, col_dates, cols):
-    plot = Figure(
+    plot = Figure(tools = "hover",
             title = 'Data from Quandl WIKI set', 
             x_axis_label = 'date',
             x_axis_type = 'datetime')
