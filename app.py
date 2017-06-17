@@ -2,8 +2,9 @@ from flask import Flask, render_template, request, redirect
 import pandas as pd
 import requests as req
 import simplejson as json
-from bokeh.plotting import Figure
+from bokeh.plotting import Figure, ColumnDataSource
 from bokeh.embed import components
+from bokeh.models import HoverTool
 
 app = Flask(__name__)
 
@@ -30,20 +31,39 @@ def get_data(requested_ticker):
 
 
 def make_plot(col_names, col_values, col_dates, cols):
-    plot = Figure(tools = "hover",
+
+    col_dates = pd.to_datetime(col_dates)
+
+    source = ColumnDataSource(dict(zip(col_names, col_values), 
+        date = col_dates))
+
+    
+    
+    hover = HoverTool(tooltips=[('open', '@open'), 
+                                ('date', '@date'),
+                                ('volume', '@volume')],  
+                                mode = 'vline')
+
+    plot = Figure(tools = [hover,'pan,wheel_zoom,box_zoom,reset,save'],
             title = 'Data from Quandl WIKI set', 
             x_axis_label = 'date',
-            x_axis_type = 'datetime')
+            x_axis_type = 'datetime', 
+            y_axis_label = str(cols))
 
     colors = ['#4286f4', '#f44242', '#f4bc42', '#50f442', '#42f4e5']
 
-    for color, col in zip(range(4), cols): 
-        plot.line(col_dates, 
-                col_values[col_names.index(col)], 
-                color = colors[color])
+    for color, colmn in zip(range(4), cols):
+        plot.line('date', colmn, 
+                color = colors[color], 
+                source = source, 
+                legend = str(colmn[0:3]))
+
+    plot.legend.location = "top_left"
+    plot.legend.click_policy = "hide"
 
     return(plot)
 
+#for later use
 app.ticker = "" 
 
 @app.route('/')
@@ -61,7 +81,8 @@ def index():
 def graph():
 
     #names of available checkboxes
-    cols_to_check = ['open', 'high', 'low', 'close', 'volume']
+    cols_to_check = ['open', 'high', 'low', 'close', 
+                    'adj_open', 'adj_high', 'adj_low', 'adj_close']
 
     #get values for those boxes
     cols_to_pull = []
