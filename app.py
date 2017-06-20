@@ -35,9 +35,7 @@ def make_plot(col_names, col_values, col_dates, cols):
     col_dates = pd.to_datetime(col_dates)
 
     source = ColumnDataSource(dict(zip(col_names, col_values), 
-        date = col_dates))
-
-    
+        date = col_dates))    
     
     hover = HoverTool(tooltips=[('open', '@open'), 
                                 ('date', '@date'),
@@ -63,18 +61,13 @@ def make_plot(col_names, col_values, col_dates, cols):
 
     return(plot)
 
-#for later use
-app.ticker = "" 
-
 @app.route('/')
 def main():
   return redirect('/index')
 
 @app.route('/index', methods = ['GET', 'POST'])
 def index():
-    #return render_template('index.html')
-#    app.ticker = request.form.get('ticker')
-    return render_template('index.html')#, ticker = app.ticker)
+    return render_template('index.html')
   
 
 @app.route('/graph', methods = ['GET', 'POST'])
